@@ -1,0 +1,33 @@
+[package]
+name = "rustbier"
+version = "0.1.0"
+authors = ["Augusto César Dias <augusto.dias@olx.com>"]
+edition = "2018"
+
+[dependencies]
+actix-web = "1.0.3"
+actix-rt = "0.2.3"
+actix-server = "0.5.1"
+actix-http = "0.2.5"
+actix-web-prom = "0.1.2"
+log = "0.4.6"
+pretty_env_logger = "0.3.0"
+rusoto_s3 = "0.40.0"
+rusoto_core = "0.40.0"
+opencv = "0.16.0"
+futures = "0.1.28"
+serde = "1.0.94"
+serde_derive = "1.0.94"
+config = "0.9.3"
+
+[dev-dependencies]
+mockers = "0.20.0"
+mockers_derive = "0.20.0"
+
+[[bin]]
+name = "rustbier"
+path = "src/main.rs"
+
+[[bin]]
+name = "rustbier_async"
+path = "src/main_async.rs"

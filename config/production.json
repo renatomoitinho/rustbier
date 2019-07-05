@@ -1,0 +1,7 @@
+{
+    "png_quality": 3,
+    "bucket": "apollo",
+    "app_port": 8080,
+    "region": "EuWest1",
+    "log_level": "info"
+}
