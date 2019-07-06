@@ -1,10 +1,15 @@
 # RustBier
 
-This application runs a web server serves images stored in S3, reencode to PNG, JPEG or WEBP, resize and add watermark to them.
+This application runs a web server which performs image transformations.
+The application supports:
+* Retrieving source images from S3
+* Encoding images to PNG, JPEG and WEBP
+* Resizing an image
+* Apply a watermark image to an image
 
 ## Configuration
 
-It is required to create a config file (`config\default.json`) for the application having the following format:
+A config file is required (`config/default.json`) for the application with the following format:
 
 ```json
 {
@@ -15,35 +20,16 @@ It is required to create a config file (`config\default.json`) for the applicati
     "log_level": "info"
 }
 ```
+| Name | Description | Required | Possible Values | Notes |
+|------|-------------|----------|-----------------|-------|
+| `log_level` | Logging level for the application | N | <ul><li>`error`</li><li>`warn`</li><li>`info`</li><li>`debug`</li><li>`trace`</li></ul> | Default value is `info`. |
+| `bucket` | S3 source bucket for images  | Y | - | |
+| `app_port` | Port which the web server listens to for requests  | Y | - | |
+| `region` | S3 region where the source bucket for images is located  | Y | <ul><li>`ApEast1`</li><li>`ApNortheast1`</li><li>`ApNortheast2`</li><li>`ApSouth1`</li><li>`ApSoutheast1`</li><li>`ApSoutheast2`</li><li>`CaCentral1`</li><li>`EuCentral1`</li><li>`EuWest1`</li><li>`EuWest2`</li><li>`EuWest3`</li><li>`EuNorth1`</li><li>`SaEast1`</li><li>`UsEast1`</li><li>`UsEast2`</li><li>`UsWest1`</li><li>`UsWest2`</li><li>`UsGovEast1`</li><li>`UsGovWest1`</li><li>`CnNorth1`</li><li>`CnNorthwest1`</li><li>`Custom`</li></ul> | When a `Custom` region is set, the configuration requires an endpoint and region name to be specified. Example shown in the following section. |
 
-The only optional config is the log_level, which will have a default value of `info`. Other possible values are: `error`, `warn`, `debug` and `trace`.
 
-The possible values for region are the following:
-* ApEast1
-* ApNortheast1
-* ApNortheast2
-* ApSouth1
-* ApSoutheast1
-* ApSoutheast2
-* CaCentral1
-* EuCentral1
-* EuWest1
-* EuWest2
-* EuWest3
-* EuNorth1
-* SaEast1
-* UsEast1
-* UsEast2
-* UsWest1
-* UsWest2
-* UsGovEast1
-* UsGovWest1
-* CnNorth1
-* CnNorthwest1
-* Custom
-
-When `Custom` is set, the configuration changes slightly, because the endpoint and region name have to be specified. Here's an example: 
-
+### Specifying a custom image source
+To specify a custom image source specify `"region": "Custom"`. The configuration requires an endpoint and region name. For example:
 ```json
 {
   "png_quality": 3,
@@ -61,10 +47,17 @@ When `Custom` is set, the configuration changes slightly, because the endpoint a
 
 ## Running locally
 
-This application relies on OpenCV C++ library. That means it has to be previously installed into the system before compiling and/or running.
-For Linux, follow [this instructions](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html).
+### Requirements
+* OpenCV
+* Minio - S3 compatible container
+* Docker
+* Cargo
 
-For Mac, run `brew install opencv`
+This application relies on OpenCV C++ library. That means it has to be previously installed into the system before compiling and/or running.
+
+For Linux installation, follow [this instructions](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html).
+
+For Mac installation, run `brew install opencv`
 
 It is necessary to have the env variable `PKG_CONFIG_PATH` set to build the application in Mac. `PKG_CONFIG_PATH=/usr/local/Cellar/opencv@3/3.4.5_2/lib/pkgconfig/` - location might change based on OpenCV version.
 
@@ -80,30 +73,42 @@ It is also possible to run both components inside docker:
 
 ```docker-compose up```
 
-AWS credentials should be informed [following the doc](https://github.com/rusoto/rusoto/blob/master/AWS-CREDENTIALS.md).
+AWS credentials should be configured [following the doc](https://github.com/rusoto/rusoto/blob/master/AWS-CREDENTIALS.md).
 
 ## Testing
 
-In the moment, the only logic the application has is regarding resizing and watermark positioning. There are some unit tests around that in the package `image_processor`. All ther other functions are deeply tied to `opencv` library, which makes harder to unit test, since it is not easily mockable.
+At the moment, the only logic the application has is regarding resizing and watermark positioning. There are some unit tests around these use cases in the package `image_processor`. All other functions are deeply tied to the `opencv` library which complicates testing since it is not easily mockable.
 
-## Endpoints
+## API
 
-The application has 3 endpoints:
+The application supports the following endpoints.
 
-1. `/health` -> simply return `200` status to assure the application is healthy.
-2. `/metrics` -> prometheus formated metrics. In the moment, it exposes only request count and duration per endpoint
-3. `/{file_name}` -> fetches and processes a file.
+### `/health`
+Signifies the application is healthy by returning a HTTP Status OK - 200 return code.
 
-The `/{file_name}` endpoint takes a filename as path paramenter and has the following optional query parameters:
+### `/metrics`
+Prometheus formatted metrics. Currently exposes request count and duration per endpoint
 
-* `format` -> desired image format. Possible values are Jpeg, Png and Webp. Defaults to Jpeg
-* `quality` -> desired quality for the image. For Jpeg, it goes from 0 to 100 (defaults to 100). For Webp, it goes from 1 to 100 (defaults to 100). For Png, it will be ignored. Png takes only compression level as parameter, and, since it impacts performance, it is set at configuration level through the field `png_quality`. It goes from 0 to 9 and a higher value means a smaller size and longer compression time. 
-* `w` -> desired width for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height.
-* `h` -> desired height for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height.
-* `wm_file` -> watermark file. File has to be smaller than original file.
-* `wm_alpha` -> opacity from the watermark over the original image. it is a floating point number from 0 to 1.
-* `wm_position` -> identifier to position the watermark starting from left-top, right-bottom or if it should be centered (`wm_px` and `wm_py` will be ignored in that case). Possible values: LeftTop (default), RightBottom, Center.
-* `wm_px` -> position of the watermark in the X axis. Value in pixels.
-* `wm_py` -> position of the watermark in the Y axis. Value in pixels.
-* `wm_h` -> optional height of the watermark. Same resizing rules from original image applies for watermark images.
-* `wm_w` -> optional width of the watermark. Same resizing rules from original image applies for watermark images.
+### `/{file_name}`
+Fetches and processes an image file.
+
+The `/{file_name}` endpoint takes a filename as path parameter and has optional query parameters described in more detail below.
+
+#### General query parameters
+| Parameter | Description |
+|-----------------|-------------|
+| `format` | desired image format. Possible values are Jpeg, Png and Webp. Defaults to Jpeg |
+| `quality` | desired quality for the image. For Jpeg, it goes from 0 to 100 (defaults to 100). For Webp, it goes from 1 to 100 (defaults to 100). For Png, it will be ignored. Png takes only compression level as parameter, and, since it impacts performance, it is set at configuration level through the field `png_quality`. It goes from 0 to 9 and a higher value means a smaller size and longer compression time.  |
+| `w` | desired width for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
+| `h` | desired height for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
+ 
+#### Watermarking query parameters
+| Parameter | Description |
+|-----------------|-------------|
+| `wm_file` | watermark file. File has to be smaller than original file. |
+| `wm_alpha` | opacity from the watermark over the original image. it is a floating point number from 0 to 1. |
+| `wm_position` | identifier to position the watermark starting from left-top, right-bottom or if it should be centered (`wm_px` and `wm_py` will be ignored in that case). Possible values: LeftTop (default), RightBottom, Center. |
+| `wm_px` | position of the watermark in the X axis. Value in pixels. |
+| `wm_py` | position of the watermark in the Y axis. Value in pixels. |
+| `wm_h` | optional height of the watermark. Same resizing rules from original image applies for watermark images. |
+| `wm_w` | optional width of the watermark. Same resizing rules from original image applies for watermark images. |
