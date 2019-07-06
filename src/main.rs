@@ -1,3 +1,5 @@
+#[cfg(test)] 
+extern crate mockers_derive;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]
@@ -163,7 +165,13 @@ fn main() -> std::io::Result<()> {
     let config = Configuration::new().expect("Failed to load application configuration.");
     let config_data = web::Data::new(config);
     let name = "rustbier";
-    env::set_var("RUST_LOG", config_data.log_level.as_ref().unwrap_or(&"info".to_string()));
+    env::set_var(
+        "RUST_LOG",
+        config_data
+            .log_level
+            .as_ref()
+            .unwrap_or(&"info".to_string()),
+    );
     pretty_env_logger::init();
     let sys = actix_rt::System::builder().stop_on_panic(false).build();
     let prometheus = PrometheusMetrics::new(name, "/metrics");
@@ -171,15 +179,19 @@ fn main() -> std::io::Result<()> {
     let s3_client_data = web::Data::new(s3);
 
     Server::build()
-        .bind(name, format!("0.0.0.0:{}", config_data.app_port), move || {
-            HttpService::build().keep_alive(KeepAlive::Os).h1(App::new()
-                .register_data(s3_client_data.clone())
-                .register_data(config_data.clone())
-                .wrap(prometheus.clone())
-                .wrap(actix_web::middleware::Logger::default())
-                .service(web::resource("/health").route(web::get().to(health)))
-                .service(web::resource("/{file_name}").route(web::get().to(index))))
-        })?
+        .bind(
+            name,
+            format!("0.0.0.0:{}", config_data.app_port),
+            move || {
+                HttpService::build().keep_alive(KeepAlive::Os).h1(App::new()
+                    .register_data(s3_client_data.clone())
+                    .register_data(config_data.clone())
+                    .wrap(prometheus.clone())
+                    .wrap(actix_web::middleware::Logger::default())
+                    .service(web::resource("/health").route(web::get().to(health)))
+                    .service(web::resource("/{file_name}").route(web::get().to(index))))
+            },
+        )?
         .start();
     sys.run()
 }

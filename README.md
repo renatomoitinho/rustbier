@@ -74,8 +74,6 @@ Also a S3 compatible container will be required to run the application.
 
 To build and run the application, run the following command:
 
-``` cargo run --bin rustbier ```
-
-The parameter `--bin` has to be specified because there's a second binary in this application. The other implementation works with futures and async http requests (it will likely be deleted due to being less effective).
+``` cargo run ```
 
 AWS credentials should be informed [following the doc](https://github.com/rusoto/rusoto/blob/master/AWS-CREDENTIALS.md).

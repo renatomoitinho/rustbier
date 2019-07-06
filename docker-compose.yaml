@@ -1,0 +1,28 @@
+version: '3'
+services:
+  s3:
+    image: minio/minio
+    volumes:
+      - /data
+    ports:
+      - 9000:9000
+    environment:
+      - MINIO_ACCESS_KEY=apollousr
+      - MINIO_SECRET_KEY=apollopwd
+    command: server /data
+  rustbier:
+    build: ./
+    image: rustbier
+    volumes:
+      - ./config:/config
+    ports: 
+      - 8080:8080
+    environment: 
+      - AWS_ACCESS_KEY_ID=apollousr
+      - AWS_SECRET_ACCESS_KEY=apollopwd
+      - RUN_MODE=compose
+    depends_on: 
+      - s3
+volumes:
+  s3-data:
+    driver: local

@@ -1,0 +1,12 @@
+{
+  "png_quality": 3,
+  "bucket": "apollo",
+  "app_port": 8080,
+  "log_level": "debug",
+  "region": {
+    "Custom": {
+      "name": "dev",
+      "endpoint": "http://s3:9000"
+    }
+  }
+}

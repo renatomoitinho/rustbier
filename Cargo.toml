@@ -21,13 +21,5 @@ serde_derive = "1.0.94"
 config = "0.9.3"
 
 [dev-dependencies]
-mockers = "0.20.0"
-mockers_derive = "0.20.0"
-
-[[bin]]
-name = "rustbier"
-path = "src/main.rs"
-
-[[bin]]
-name = "rustbier_async"
-path = "src/main_async.rs"
+mockers = "0.21.0"
+mockers_derive = "0.21.0"
