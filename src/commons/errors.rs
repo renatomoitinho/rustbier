@@ -3,7 +3,7 @@ use std::convert::From;
 use std::error::Error;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct InvalidSizeError {
     msg: String,
 }

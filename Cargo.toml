@@ -19,7 +19,3 @@ futures = "0.1.28"
 serde = "1.0.94"
 serde_derive = "1.0.94"
 config = "0.9.3"
-
-[dev-dependencies]
-mockers = "0.21.0"
-mockers_derive = "0.21.0"

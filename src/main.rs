@@ -1,5 +1,3 @@
-#[cfg(test)] 
-extern crate mockers_derive;
 #[macro_use]
 extern crate serde_derive;
 #[macro_use]

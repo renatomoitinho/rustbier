@@ -109,50 +109,7 @@ fn resize_image(img: &core::Mat, size: &Size) -> Result<core::Mat, opencv::Error
         original_width, original_height, size
     );
 
-    let (target_width, target_height) = match &size {
-        Size {
-            width: None,
-            height: None,
-        } => return img.clone(),
-        s if is_negative_or_zero(s) => return Err(InvalidSizeError::new(&size).into()),
-        Size {
-            width: Some(w),
-            height: Some(h),
-        } if *h > original_height && *w > original_width => (original_width, original_height),
-        Size {
-            width: Some(w),
-            height: Some(h),
-        } => {
-            let diff_height = *h as f32 / original_height as f32;
-            let diff_width = *w as f32 / original_width as f32;
-
-            if diff_height < diff_width && diff_height <= 1.0 {
-                (get_ratio(*h, original_height, original_width), *h)
-            } else {
-                (*w, get_ratio(*w, original_width, original_height))
-            }
-        }
-        Size {
-            width: None,
-            height: Some(h),
-        } => {
-            if *h > original_height {
-                (original_width, original_height)
-            } else {
-                (get_ratio(*h, original_height, original_width), *h)
-            }
-        }
-        Size {
-            width: Some(w),
-            height: None,
-        } => {
-            if *w > original_width {
-                (original_width, original_height)
-            } else {
-                (*w, get_ratio(*w, original_width, original_height))
-            }
-        }
-    };
+    let (target_width, target_height) = get_target_size(original_width, original_height, &size)?;
 
     debug!("Final size: {}x{}", target_width, target_height);
     let mut result = core::Mat::new()?;
@@ -180,4 +137,466 @@ fn get_ratio(desired_measure: i32, original_measure: i32, opposite_orig_measure:
 fn is_negative_or_zero(size: &Size) -> bool {
     (size.height.is_some() && size.height.unwrap() <= 0)
         || (size.width.is_some() && size.width.unwrap() <= 0)
+}
+
+fn get_target_size(
+    original_width: i32,
+    original_height: i32,
+    desired_size: &Size,
+) -> Result<(i32, i32), InvalidSizeError> {
+    match &desired_size {
+        Size {
+            width: None,
+            height: None,
+        } => Ok((original_width, original_height)),
+        s if is_negative_or_zero(s) => Err(InvalidSizeError::new(&desired_size)),
+        Size {
+            width: Some(w),
+            height: Some(h),
+        } if *h > original_height && *w > original_width => Ok((original_width, original_height)),
+        Size {
+            width: Some(w),
+            height: Some(h),
+        } => {
+            let diff_height = *h as f32 / original_height as f32;
+            let diff_width = *w as f32 / original_width as f32;
+
+            if diff_height < diff_width && diff_height <= 1.0 {
+                Ok((get_ratio(*h, original_height, original_width), *h))
+            } else {
+                Ok((*w, get_ratio(*w, original_width, original_height)))
+            }
+        }
+        Size {
+            width: None,
+            height: Some(h),
+        } => {
+            if *h > original_height {
+                Ok((original_width, original_height))
+            } else {
+                Ok((get_ratio(*h, original_height, original_width), *h))
+            }
+        }
+        Size {
+            width: Some(w),
+            height: None,
+        } => {
+            if *w > original_width {
+                Ok((original_width, original_height))
+            } else {
+                Ok((*w, get_ratio(*w, original_width, original_height)))
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_invalid_size() {
+        assert!(get_target_size(
+            100,
+            100,
+            &Size {
+                width: Some(-1),
+                height: Some(-1)
+            }
+        )
+        .is_err());
+        assert!(get_target_size(
+            100,
+            100,
+            &Size {
+                width: Some(-1),
+                height: Some(1)
+            }
+        )
+        .is_err());
+        assert!(get_target_size(
+            100,
+            100,
+            &Size {
+                width: Some(1),
+                height: Some(-1)
+            }
+        )
+        .is_err());
+        assert!(get_target_size(
+            100,
+            100,
+            &Size {
+                width: None,
+                height: Some(-1)
+            }
+        )
+        .is_err());
+        assert!(get_target_size(
+            100,
+            100,
+            &Size {
+                width: Some(-1),
+                height: None
+            }
+        )
+        .is_err());
+    }
+
+    #[test]
+    fn test_size_square_img() {
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: Some(100)
+                }
+            ),
+            Ok((100, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(10),
+                    height: Some(10)
+                }
+            ),
+            Ok((10, 10))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(10),
+                    height: Some(20)
+                }
+            ),
+            Ok((10, 10))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(20),
+                    height: Some(10)
+                }
+            ),
+            Ok((10, 10))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: Some(50)
+                }
+            ),
+            Ok((50, 50))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(50),
+                    height: Some(100)
+                }
+            ),
+            Ok((50, 50))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(120),
+                    height: Some(100)
+                }
+            ),
+            Ok((100, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: Some(120)
+                }
+            ),
+            Ok((100, 100))
+        );
+    }
+
+    #[test]
+    fn test_size_rectangular_img() {
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(100),
+                    height: Some(150)
+                }
+            ),
+            Ok((100, 150))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(100),
+                    height: Some(100)
+                }
+            ),
+            Ok((66, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(120),
+                    height: Some(100)
+                }
+            ),
+            Ok((66, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(100),
+                    height: Some(50)
+                }
+            ),
+            Ok((33, 50))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(50),
+                    height: Some(100)
+                }
+            ),
+            Ok((50, 75))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(200),
+                    height: Some(200)
+                }
+            ),
+            Ok((100, 150))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(200),
+                    height: Some(150)
+                }
+            ),
+            Ok((100, 150))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: Some(100),
+                    height: Some(200)
+                }
+            ),
+            Ok((100, 150))
+        );
+    }
+
+    #[test]
+    fn test_size_rectangular_img2() {
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(150),
+                    height: Some(100)
+                }
+            ),
+            Ok((150, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: Some(100)
+                }
+            ),
+            Ok((100, 66))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(120),
+                    height: Some(100)
+                }
+            ),
+            Ok((120, 80))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: Some(50)
+                }
+            ),
+            Ok((75, 50))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(50),
+                    height: Some(100)
+                }
+            ),
+            Ok((50, 33))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(200),
+                    height: Some(200)
+                }
+            ),
+            Ok((150, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(200),
+                    height: Some(150)
+                }
+            ),
+            Ok((150, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: Some(200)
+                }
+            ),
+            Ok((100, 66))
+        );
+    }
+
+    #[test]
+    fn test_size_optional() {
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: None
+                }
+            ),
+            Ok((100, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: None,
+                    height: Some(100)
+                }
+            ),
+            Ok((100, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                50,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: None
+                }
+            ),
+            Ok((50, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                50,
+                &Size {
+                    width: None,
+                    height: Some(100)
+                }
+            ),
+            Ok((100, 50))
+        );
+        assert_eq!(
+            get_target_size(
+                150,
+                100,
+                &Size {
+                    width: Some(100),
+                    height: None
+                }
+            ),
+            Ok((100, 66))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                150,
+                &Size {
+                    width: None,
+                    height: Some(100)
+                }
+            ),
+            Ok((66, 100))
+        );
+        assert_eq!(
+            get_target_size(
+                100,
+                100,
+                &Size {
+                    width: None,
+                    height: None
+                }
+            ),
+            Ok((100, 100))
+        );
+    }
 }
