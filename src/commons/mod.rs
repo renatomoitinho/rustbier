@@ -54,6 +54,7 @@ pub struct ProcessImageRequest<'a> {
 pub struct Watermark<'a> {
     pub file: &'a [u8],
     pub position: Point,
+    pub origin: WatermarkPosition,
     pub alpha: f64,
     pub size: Size,
 }
@@ -62,6 +63,13 @@ pub struct Watermark<'a> {
 pub struct Size {
     pub width: Option<i32>,
     pub height: Option<i32>,
+}
+
+#[derive(Debug, Deserialize, Clone, Copy)]
+pub enum WatermarkPosition {
+    Center,
+    LeftTop,
+    RightBottom,
 }
 
 #[derive(Debug)]

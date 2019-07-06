@@ -61,10 +61,14 @@ fn apply_watermark(img: &core::Mat, watermark: &Watermark) -> Result<core::Mat, 
     let wm_mat = imgcodecs::imdecode(&mat_buf, imgcodecs::IMREAD_COLOR)?;
     let resized_wm = resize_image(&wm_mat, &watermark.size)?;
 
-    let left = watermark.position.x;
-    let top = watermark.position.y;
-    let bottom = img.rows()? - watermark.position.y - resized_wm.rows()?;
-    let right = img.cols()? - watermark.position.x - resized_wm.cols()?;
+    let (left, top, right, bottom) = get_watermark_borders(
+        img.cols()?,
+        img.rows()?,
+        resized_wm.cols()?,
+        resized_wm.rows()?,
+        &watermark.position,
+        &watermark.origin,
+    );
 
     debug!("Adding borders to make images the same size. Padding: top: {}, left: {}, bottom: {}, right: {}", top, left, bottom, right);
 
@@ -186,6 +190,49 @@ fn get_target_size(
             } else {
                 Ok((*w, get_ratio(*w, original_width, original_height)))
             }
+        }
+    }
+}
+
+fn get_watermark_borders(
+    width: i32,
+    height: i32,
+    wm_width: i32,
+    wm_height: i32,
+    point: &Point,
+    origin: &WatermarkPosition,
+) -> (i32, i32, i32, i32) {
+    match origin {
+        WatermarkPosition::Center => {
+            let left = (width / 2) - (wm_width / 2);
+            let top = (height / 2) - (wm_height / 2);
+            let odd_w_acc = width % 2;
+            let odd_h_acc = height % 2;
+            (left, top, left + odd_w_acc, top + odd_h_acc)
+        }
+        WatermarkPosition::LeftTop => {
+            let right = width - point.x - wm_width;
+            let bottom = height - point.y - wm_height;
+            let left = point.x + if right < 0 { right } else { 0 };
+            let top = point.y + if bottom < 0 { bottom } else { 0 };
+            (
+                left,
+                top,
+                if right > 0 { right } else { 0 },
+                if bottom > 0 { bottom } else { 0 },
+            )
+        }
+        WatermarkPosition::RightBottom => {
+            let left = width - point.x - wm_width;
+            let top = height - point.y - wm_height;
+            let right = point.x + if left < 0 { left } else { 0 };
+            let bottom = point.y + if top < 0 { top } else { 0 };
+            (
+                if left > 0 { left } else { 0 },
+                if top > 0 { top } else { 0 },
+                right,
+                bottom,
+            )
         }
     }
 }
@@ -597,6 +644,128 @@ mod tests {
                 }
             ),
             Ok((100, 100))
+        );
+    }
+
+    #[test]
+    fn test_center_watermark() {
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 10, y: 10 },
+                &WatermarkPosition::Center
+            ),
+            (45, 45, 45, 45)
+        );
+        assert_eq!(
+            get_watermark_borders(
+                101,
+                101,
+                10,
+                10,
+                &Point { x: 10, y: 10 },
+                &WatermarkPosition::Center
+            ),
+            (45, 45, 46, 46)
+        );
+    }
+
+    #[test]
+    fn test_left_top_watermark() {
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 10, y: 10 },
+                &WatermarkPosition::LeftTop
+            ),
+            (10, 10, 80, 80)
+        );
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 95, y: 10 },
+                &WatermarkPosition::LeftTop
+            ),
+            (90, 10, 0, 80)
+        );
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 10, y: 95 },
+                &WatermarkPosition::LeftTop
+            ),
+            (10, 90, 80, 0)
+        );
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 95, y: 95 },
+                &WatermarkPosition::LeftTop
+            ),
+            (90, 90, 0, 0)
+        );
+    }
+
+    #[test]
+    fn test_right_bottom_watermark() {
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 10, y: 10 },
+                &WatermarkPosition::RightBottom
+            ),
+            (80, 80, 10, 10)
+        );
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 95, y: 10 },
+                &WatermarkPosition::RightBottom
+            ),
+            (0, 80, 90, 10)
+        );
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 10, y: 95 },
+                &WatermarkPosition::RightBottom
+            ),
+            (80, 0, 10, 90)
+        );
+        assert_eq!(
+            get_watermark_borders(
+                100,
+                100,
+                10,
+                10,
+                &Point { x: 95, y: 95 },
+                &WatermarkPosition::RightBottom
+            ),
+            (0, 0, 90, 90)
         );
     }
 }

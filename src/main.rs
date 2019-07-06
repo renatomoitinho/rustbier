@@ -30,6 +30,7 @@ struct QueryParameters {
     quality: Option<i32>,
     w: Option<i32>,
     h: Option<i32>,
+    wm_position: Option<WatermarkPosition>,
     wm_px: Option<i32>,
     wm_py: Option<i32>,
     wm_file: Option<String>,
@@ -135,6 +136,10 @@ fn index(
                         x: query.wm_px.unwrap_or_default(),
                         y: query.wm_py.unwrap_or_default(),
                     },
+                    origin: query
+                        .wm_position
+                        .clone()
+                        .unwrap_or(WatermarkPosition::LeftTop),
                     alpha: query.wm_alpha.unwrap_or_default(),
                     size: Size {
                         width: query.wm_w,
