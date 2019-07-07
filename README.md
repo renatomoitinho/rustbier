@@ -52,7 +52,7 @@ To specify a custom image source specify `"region": "Custom"`. The configuration
 * OpenCV
 * Minio - S3 compatible container
 * Docker
-* Cargo
+* Rust
 
 This application relies on OpenCV C++ library. That means it has to be previously installed into the system before compiling and/or running.
 
@@ -61,6 +61,8 @@ For Linux installation, follow [this instructions](https://docs.opencv.org/maste
 For Mac installation, run `brew install opencv`
 
 It is necessary to have the env variable `PKG_CONFIG_PATH` set to build the application in Mac. `PKG_CONFIG_PATH=/usr/local/Cellar/opencv@3/3.4.5_2/lib/pkgconfig/` - location might change based on OpenCV version.
+
+Using `rustup` is the recommended way to install `rust`. It is a tool that manages and updates rust versions (like `nvm` for node for example). To install it, simply run `curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh`. Then run `rustup update`.
 
 Also a S3 compatible container will be required to run the application.
 
@@ -117,4 +119,4 @@ The `/{file_name}` endpoint takes a filename as path parameter and has optional 
 
 ## Conclusion
 
-YES! We love beer! :beers:
+YES, we lack naming creativiy, BUT, we love beer! :beers:
