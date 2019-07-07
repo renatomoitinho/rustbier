@@ -25,6 +25,7 @@ A config file is required (`config/default.json`) for the application with the f
 | `log_level` | Logging level for the application | N | <ul><li>`error`</li><li>`warn`</li><li>`info`</li><li>`debug`</li><li>`trace`</li></ul> | Default value is `info`. |
 | `bucket` | S3 source bucket for images  | Y | - | |
 | `app_port` | Port which the web server listens to for requests  | Y | - | |
+| `png_quality`| The PNG compression level for images encoded in this format. | Y | 0-9 | This setting impacts performance of the encoder and a higher value means a smaller size and longer compression time. |
 | `region` | S3 region where the source bucket for images is located  | Y | <ul><li>`ApEast1`</li><li>`ApNortheast1`</li><li>`ApNortheast2`</li><li>`ApSouth1`</li><li>`ApSoutheast1`</li><li>`ApSoutheast2`</li><li>`CaCentral1`</li><li>`EuCentral1`</li><li>`EuWest1`</li><li>`EuWest2`</li><li>`EuWest3`</li><li>`EuNorth1`</li><li>`SaEast1`</li><li>`UsEast1`</li><li>`UsEast2`</li><li>`UsWest1`</li><li>`UsWest2`</li><li>`UsGovEast1`</li><li>`UsGovWest1`</li><li>`CnNorth1`</li><li>`CnNorthwest1`</li><li>`Custom`</li></ul> | When a `Custom` region is set, the configuration requires an endpoint and region name to be specified. Example shown in the following section. |
 
 
@@ -98,7 +99,7 @@ The `/{file_name}` endpoint takes a filename as path parameter and has optional 
 | Parameter | Description |
 |-----------------|-------------|
 | `format` | desired image format. Possible values are Jpeg, Png and Webp. Defaults to Jpeg |
-| `quality` | desired quality for the image. For Jpeg, it goes from 0 to 100 (defaults to 100). For Webp, it goes from 1 to 100 (defaults to 100). For Png, it will be ignored. Png takes only compression level as parameter, and, since it impacts performance, it is set at configuration level through the field `png_quality`. It goes from 0 to 9 and a higher value means a smaller size and longer compression time.  |
+| `quality` | desired quality for the image. For Jpeg, it goes from 0 to 100 (defaults to 100). For Webp, it goes from 1 to 100 (defaults to 100). For Png, it will be ignored. |
 | `w` | desired width for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
 | `h` | desired height for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
  
