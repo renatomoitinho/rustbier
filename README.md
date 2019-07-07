@@ -119,7 +119,7 @@ Then to setup the test, the bencher calls the outer function which has the setup
     4. check if converged after 100ms, and exit prematurely
     5. if run longer than 3 seconds, exit
 
-Example output from a 4 core 2.3GHz MacBook:
+It outputs the average time per iteration and the deviation between max and min. Example output from a 4 core 2.3GHz MacBook:
 
 ```test bench_highhes ... bench:  71,112,344 ns/iter (+/- 7,798,699)```
 
