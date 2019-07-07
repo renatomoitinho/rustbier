@@ -1,4 +1,4 @@
-# RustBier
+# RustBier :beer:
 
 This application runs a web server which performs image transformations.
 The application supports:
@@ -113,3 +113,8 @@ The `/{file_name}` endpoint takes a filename as path parameter and has optional 
 | `wm_py` | position of the watermark in the Y axis. Value in pixels. |
 | `wm_h` | optional height of the watermark. Same resizing rules from original image applies for watermark images. |
 | `wm_w` | optional width of the watermark. Same resizing rules from original image applies for watermark images. |
+
+
+## Conclusion
+
+YES! We love beer! :beers:
