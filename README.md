@@ -72,7 +72,7 @@ To build and run the application, run the following command:
 
 ``` cargo run ```
 
-It is also possible to run both components inside docker:
+Alternatively, it is possible to run both components inside docker:
 
 ```docker-compose up```
 
