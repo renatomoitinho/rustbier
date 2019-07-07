@@ -14,8 +14,11 @@ log = "0.4.6"
 pretty_env_logger = "0.3.0"
 rusoto_s3 = "0.40.0"
 rusoto_core = "0.40.0"
-opencv = "0.16.0"
+opencv = "0.17.0"
 futures = "0.1.28"
 serde = "1.0.94"
 serde_derive = "1.0.94"
 config = "0.9.3"
+
+[dev-dependencies]
+bytes = "0.4.12"

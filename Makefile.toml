@@ -1,0 +1,29 @@
+[config]
+end_task = "down"
+
+[env]
+AWS_ACCESS_KEY_ID = "apollousr"
+AWS_SECRET_ACCESS_KEY = "apollopwd"
+
+[tasks.up]
+script = [
+    "docker-compose up -d"
+]
+
+[tasks.upload_test]
+dependencies = ["up"]
+script = [
+    "docker-compose exec s3 mkdir /data/apollo || true",
+    "docker cp tests/resources/watermark rustbier_s3_1:/data/apollo/watermark",
+    "docker cp tests/resources/img-test rustbier_s3_1:/data/apollo/img-test"
+]
+
+[tasks.test]
+command = "cargo"
+args = ["test"]
+dependencies = ["upload_test"]
+
+[tasks.down]
+script = [
+    "docker-compose down"
+]

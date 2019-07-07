@@ -80,7 +80,17 @@ AWS credentials should be configured [following the doc](https://github.com/ruso
 
 ## Testing
 
+There are 2 kinds of tests: unit tests and integration tests.
+
+### Unit Tests
+
 At the moment, the only logic the application has is regarding resizing and watermark positioning. There are some unit tests around these use cases in the package `image_processor`. All other functions are deeply tied to the `opencv` library which complicates testing since it is not easily mockable.
+To run them, simply execute: `cargo test --bin rustbier`. The parameter `--bin` is needed because otherwise it would run also integration tests.
+
+### Integration Tests
+
+This tests run over a running application. In order to run them, first it is necessary to install a package: `cargo install cargo-make`. To run the tests, the script will start the containers through `docker-compose`, copy some sample files to the `s3` container and run the tests over the application, checking the array of bytes from the responses against expected result images stored in the `tests/resources/results` directory. To run the whole flow, simply run: `cargo make test`. 
+
 
 ## API
 
