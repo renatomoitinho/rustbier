@@ -15,6 +15,7 @@ dependencies = ["up"]
 script = [
     "docker-compose exec s3 mkdir /data/apollo || true",
     "docker cp tests/resources/watermark rustbier_s3_1:/data/apollo/watermark",
+    "docker cp tests/resources/highres rustbier_s3_1:/data/apollo/highres",
     "docker cp tests/resources/img-test rustbier_s3_1:/data/apollo/img-test"
 ]
 

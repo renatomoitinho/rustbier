@@ -80,7 +80,7 @@ AWS credentials should be configured [following the doc](https://github.com/ruso
 
 ## Testing
 
-There are 2 kinds of tests: unit tests and integration tests.
+There are 3 kinds of tests: unit, integration and benchmark tests.
 
 ### Unit Tests
 
@@ -91,6 +91,37 @@ To run them, simply execute: `cargo test --bin rustbier`. The parameter `--bin` 
 
 This tests run over a running application. In order to run them, first it is necessary to install a package: `cargo install cargo-make`. To run the tests, the script will start the containers through `docker-compose`, copy some sample files to the `s3` container and run the tests over the application, checking the array of bytes from the responses against expected result images stored in the `tests/resources/results` directory. To run the whole flow, simply run: `cargo make test`. 
 
+### Benchmark Tests
+
+This is an experimental feature from rust, so in order to use, the nightly rust toolchain has to be enabled. To do that run:
+
+```
+rustup toolchain install nightly
+rustup default nightly
+```
+
+To rollback to stable, run `rustup default stable`. 
+
+To run the benchmark, simply call `cargo bench` (application must be running at localhost on port 8080).
+
+#### What happens under the hood
+
+When the bencher is run, it collects functions with the `#[bench]` attribute and calls `test::bench::benchmark`.
+
+Then to setup the test, the bencher calls the outer function which has the setup code. The `iter` function is the core of the test. It:
+
+1. Runs single iteration to get a rough time estimate
+2. Determines how many runs per millisecond we can do, with a minimum of 1. Call this N
+3. Loops
+    1. run 50 iterations, measuring N at a time
+    2. throw out outliers (<5% or >95%)
+    3. run 50 iterations, measuring 5*N at a time
+    4. check if converged after 100ms, and exit prematurely
+    5. if run longer than 3 seconds, exit
+
+Example output from a 4 core 2.3GHz MacBook:
+
+```test bench_highhes ... bench:  71,112,344 ns/iter (+/- 7,798,699)```
 
 ## API
 
