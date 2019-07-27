@@ -1,13 +1,13 @@
 #![feature(test)]
 extern crate test;
-use test::Bencher;
 use actix_rt::System;
 use actix_web::client::Client;
 use futures::future::lazy;
 use futures::future::Future;
+use test::Bencher;
 
 #[bench]
-fn bench_highhes(bencher: &mut Bencher) {
+fn bench(bencher: &mut Bencher) {
     bencher.iter(|| {
         System::new("test").block_on(lazy(|| {
             let client = Client::default();

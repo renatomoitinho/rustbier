@@ -125,7 +125,7 @@ fn test_get_all_features() {
     let expected = utils::get_results_file("all_features.webp");
     let result = utils::make_request(
         &utils::RequestParametersBuilder::new("img-test".to_string())
-            .with_format(utils::ImageFormat::Jpeg)
+            .with_format(utils::ImageFormat::Webp)
             .with_quality(50)
             .with_watermark(
                 "watermark".to_string(),

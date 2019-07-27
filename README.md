@@ -54,11 +54,14 @@ To specify a custom image source specify `"region": "Custom"`. The configuration
 * Docker
 * Rust
 
-This application relies on OpenCV C++ library. That means it has to be previously installed into the system before compiling and/or running.
+This application relies on OpenCV C++ and ImageMagick libraries. That means it has to be previously installed into the system before compiling and/or running. (OpenCV is faster but produces bad results for watermarking, on the other hand ImageMagick produces better results but it is slower for resizing and re-encoding. Due to that, ImageMagick is used for watermarking only)
 
-For Linux installation, follow [this instructions](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html).
+For Linux installation, follow these instructions:
 
-For Mac installation, run `brew install opencv`
+* [OpenCV](https://docs.opencv.org/master/d7/d9f/tutorial_linux_install.html) - version 3.x required.
+* [ImageMagick](https://imagemagick.org/script/download.php) - version 7 or superior required.
+
+For Mac installation, run `brew install opencv imagemagick`
 
 It is necessary to have the env variable `PKG_CONFIG_PATH` set to build the application in Mac. `PKG_CONFIG_PATH=/usr/local/Cellar/opencv@3/3.4.5_2/lib/pkgconfig/` - location might change based on OpenCV version.
 

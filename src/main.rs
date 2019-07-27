@@ -19,10 +19,14 @@ use actix_web::{dev::Body, web, App, HttpRequest, HttpResponse};
 use actix_web_prom::PrometheusMetrics;
 use commons::*;
 use image_processor::*;
+use magick_rust::magick_wand_genesis;
 use rusoto_core::RusotoError;
 use rusoto_s3::{GetObjectError, GetObjectRequest, S3Client, S3};
 use std::env;
 use std::io::Read;
+use std::sync::Once;
+
+static START: Once = Once::new();
 
 #[derive(Debug, Deserialize)]
 struct QueryParameters {
@@ -165,6 +169,9 @@ fn health() -> HttpResponse {
 }
 
 fn main() -> std::io::Result<()> {
+    START.call_once(|| {
+        magick_wand_genesis();
+    });
     let config = Configuration::new().expect("Failed to load application configuration.");
     let config_data = web::Data::new(config);
     let name = "rustbier";

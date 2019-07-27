@@ -5,20 +5,21 @@ authors = ["Augusto César Dias <augusto.dias@olx.com>"]
 edition = "2018"
 
 [dependencies]
-actix-web = "1.0.3"
-actix-rt = "0.2.3"
-actix-server = "0.5.1"
-actix-http = "0.2.5"
+actix-web = "1.0.5"
+actix-rt = "0.2.4"
+actix-server = "0.6.0"
+actix-http = "0.2.7"
 actix-web-prom = "0.1.2"
-log = "0.4.6"
+log = "0.4.7"
 pretty_env_logger = "0.3.0"
 rusoto_s3 = "0.40.0"
 rusoto_core = "0.40.0"
-opencv = "0.17.0"
+opencv = "0.17.3"
 futures = "0.1.28"
-serde = "1.0.94"
-serde_derive = "1.0.94"
+serde = "1.0.97"
+serde_derive = "1.0.97"
 config = "0.9.3"
+magick_rust = { git = "https://github.com/nlfiedler/magick-rust" }
 
 [dev-dependencies]
 bytes = "0.4.12"
