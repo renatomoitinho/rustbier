@@ -11,8 +11,7 @@ services:
       - MINIO_SECRET_KEY=apollopwd
     command: server /data
   rustbier:
-    build: ./
-    image: rustbier
+    image: registry.naspersclassifieds.com/shared-services/core-services/rustbier/rustbier
     volumes:
       - ./config:/config
     ports: 

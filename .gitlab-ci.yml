@@ -1,0 +1,32 @@
+image: registry.naspersclassifieds.com/shared-services/core-services/build-runtime
+
+services:
+  - docker:dind
+
+before_script:
+  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+  - rustup update
+  - cargo install cargo-make
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+stages:
+- build
+- tests
+
+build-base-image:
+  stage: build
+  when: master
+  script:
+    - cargo make build_base_image
+
+build:
+  stage: build
+  when: master
+  script:
+    - cargo make build_image
+
+e2e:
+  stage: tests
+  script:
+    - cargo make test
+    - cargo make down
