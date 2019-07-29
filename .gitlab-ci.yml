@@ -4,7 +4,8 @@ services:
   - docker:dind
 
 before_script:
-  - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+  - wget -O rustup-init https://sh.rustup.rs && chmod +x rustup-init
+  - ./rustup-init -y
   - rustup update
   - cargo install cargo-make
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -19,7 +20,6 @@ build-base-image:
   only:
     refs:
       - master
-
   script:
     - cargo make build_base_image
 
