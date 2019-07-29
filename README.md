@@ -54,7 +54,7 @@ To specify a custom image source specify `"region": "Custom"`. The configuration
 * Docker
 * Rust
 
-This application relies on OpenCV C++ and ImageMagick libraries. That means it has to be previously installed into the system before compiling and/or running. (OpenCV is faster but produces bad results for watermarking, on the other hand ImageMagick produces better results but it is slower for resizing and re-encoding. Due to that, ImageMagick is used for watermarking only)
+This application relies on OpenCV and ImageMagick C++ libraries. That means it has to be previously installed into the system before compiling and/or running. (OpenCV is faster but produces bad results for watermarking, on the other hand ImageMagick produces better results but it is slower for resizing and re-encoding. Due to that, ImageMagick is used for watermarking only)
 
 For Linux installation, follow these instructions:
 

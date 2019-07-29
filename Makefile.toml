@@ -28,3 +28,15 @@ dependencies = ["upload_test"]
 script = [
     "docker-compose down"
 ]
+
+[tasks.build_base_image]
+script = [
+    "docker build -f base.Dockerfile -t registry.naspersclassifieds.com/shared-services/core-services/rustbier/base-rust-image .",
+    "docker push registry.naspersclassifieds.com/shared-services/core-services/rustbier/base-rust-image"
+]
+
+[tasks.build_image]
+script = [
+    "docker build -t registry.naspersclassifieds.com/shared-services/core-services/rustbier/rustbier .",
+    "docker push registry.naspersclassifieds.com/shared-services/core-services/rustbier/rustbier"
+]
