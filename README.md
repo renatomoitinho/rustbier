@@ -92,7 +92,8 @@ To run them, simply execute: `cargo test --bin rustbier`. The parameter `--bin` 
 
 ### Integration Tests
 
-This tests run over a running application. In order to run them, first it is necessary to install a package: `cargo install cargo-make`. To run the tests, the script will start the containers through `docker-compose`, copy some sample files to the `s3` container and run the tests over the application, checking the array of bytes from the responses against expected result images stored in the `tests/resources/results` directory. To run the whole flow, simply run: `cargo make test`. 
+This tests run over a running application. 
+To run the tests, the script will start the containers through `docker-compose`, copy some sample files to the `s3` container and run the tests over the application, checking the array of bytes from the responses against expected result images stored in the `tests/resources/results` directory. To run the whole flow, simply run: `make test`. 
 
 ### Benchmark Tests
 
