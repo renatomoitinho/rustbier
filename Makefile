@@ -25,7 +25,7 @@ test: setup-test
 	cargo test
 
 build-base-image:
-	docker build -f base.Dockerfile -t "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:$(VERSION_TAG)" .
+	docker build -f Dockerfile.base -t "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:$(VERSION_TAG)" .
 	docker tag "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:$(VERSION_TAG)" "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:latest"
 	docker push "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:$(VERSION_TAG)"
 	docker push "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:latest"

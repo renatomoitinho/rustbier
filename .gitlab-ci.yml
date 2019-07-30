@@ -18,6 +18,9 @@ build-base-image:
   script:
     - make build-base-image
   only:
+    changes:
+      - Dockerfile.base
+      - Makefile
     refs:
       - master
 
