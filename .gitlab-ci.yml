@@ -13,6 +13,8 @@ stages:
 
 build-base-image:
   stage: build-base
+  variables:
+    REVISION: "$(CI_COMMIT_SHA)"
   script:
     - make build-base-image
   only:
@@ -21,6 +23,8 @@ build-base-image:
 
 build:
   stage: build
+  variables:
+    REVISION: "$(CI_COMMIT_SHA)"
   script:
     - make build-image
   only:
