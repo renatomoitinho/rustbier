@@ -3,8 +3,6 @@ FROM registry.naspersclassifieds.com/shared-services/core-services/rustbier/base
 WORKDIR /usr/src/rustbier
 COPY . .
 
-RUN cargo test
-
 RUN cargo install --path .
 
 WORKDIR /
