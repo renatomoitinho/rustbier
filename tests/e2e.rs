@@ -11,6 +11,17 @@ fn test_get_simple() {
 }
 
 #[test]
+fn test_get_rotated() {
+    let expected = utils::get_results_file("raw_rotated.jpg");
+    let result = utils::make_request(
+        &utils::RequestParametersBuilder::new("img-test".to_string())
+            .with_rotation(utils::Rotation::R270),
+    )
+    .expect("Unable to download file");
+    assert!(expected == result);
+}
+
+#[test]
 fn test_get_resized() {
     let expected = utils::get_results_file("resized.jpg");
     let result = utils::make_request(
@@ -75,6 +86,26 @@ fn test_get_watermarked_center() {
 }
 
 #[test]
+fn test_get_watermarked_rotated() {
+    let expected = utils::get_results_file("rotated_watermarked.jpg");
+    let result = utils::make_request(
+        &utils::RequestParametersBuilder::new("img-test".to_string())
+            .with_watermark(
+                "watermark".to_string(),
+                100,
+                100,
+                0.5f64,
+                10,
+                10,
+                utils::WatermarkPosition::Center,
+            )
+            .with_rotation(utils::Rotation::R90),
+    )
+    .expect("Unable to download file");
+    assert!(expected == result);
+}
+
+#[test]
 fn test_get_encoded_png() {
     let expected = utils::get_results_file("raw.png");
     let result = utils::make_request(
@@ -127,6 +158,7 @@ fn test_get_all_features() {
         &utils::RequestParametersBuilder::new("img-test".to_string())
             .with_format(utils::ImageFormat::Webp)
             .with_quality(50)
+            .with_rotation(utils::Rotation::R180)
             .with_watermark(
                 "watermark".to_string(),
                 50,

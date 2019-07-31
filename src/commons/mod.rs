@@ -49,6 +49,7 @@ pub struct ProcessImageRequest<'a> {
     pub format: ImageFormat,
     pub quality: i32,
     pub watermark: Option<Watermark<'a>>,
+    pub rotation: Option<Rotation>,
 }
 
 #[derive(Debug)]
@@ -71,6 +72,13 @@ pub enum WatermarkPosition {
     Center,
     LeftTop,
     RightBottom,
+}
+
+#[derive(Debug, Deserialize, Clone, Copy)]
+pub enum Rotation {
+    R90,
+    R180,
+    R270,
 }
 
 #[derive(Debug)]

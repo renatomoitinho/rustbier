@@ -21,12 +21,19 @@ pub struct RequestParametersBuilder {
     wm_alpha: Option<f64>,
     wm_h: Option<i32>,
     wm_w: Option<i32>,
+    r: Option<Rotation>,
 }
 
 pub enum WatermarkPosition {
     Center,
     LeftTop,
     RightBottom,
+}
+
+pub enum Rotation {
+    R90,
+    R180,
+    R270,
 }
 
 pub enum ImageFormat {
@@ -50,6 +57,7 @@ impl RequestParametersBuilder {
             wm_alpha: None,
             wm_h: None,
             wm_w: None,
+            r: None,
         }
     }
 
@@ -60,6 +68,11 @@ impl RequestParametersBuilder {
 
     pub fn with_quality(&mut self, quality: i32) -> &mut Self {
         self.quality = Some(quality);
+        self
+    }
+
+    pub fn with_rotation(&mut self, rotation: Rotation) -> &mut Self {
+        self.r = Some(rotation);
         self
     }
 
@@ -152,6 +165,9 @@ fn get_url(params: &RequestParametersBuilder) -> String {
     if let Some(wm_py) = params.wm_py {
         query_string.push(format!("wm_py={}", wm_py));
     }
+    if let Some(rotation) = &params.r {
+        query_string.push(format!("r={}", rotation));
+    }
     format!(
         "http://localhost:8080/{}?{}",
         params.filename,
@@ -176,6 +192,17 @@ impl fmt::Display for ImageFormat {
             ImageFormat::Jpeg => "Jpeg",
             ImageFormat::Png => "Png",
             ImageFormat::Webp => "Webp",
+        };
+        write!(f, "{}", as_str)
+    }
+}
+
+impl fmt::Display for Rotation {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let as_str = match self {
+            Rotation::R90 => "R90",
+            Rotation::R180 => "R180",
+            Rotation::R270 => "R270",
         };
         write!(f, "{}", as_str)
     }

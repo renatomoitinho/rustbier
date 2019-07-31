@@ -145,7 +145,7 @@ The `/{file_name}` endpoint takes a filename as path parameter and has optional 
 #### General query parameters
 | Parameter | Description |
 |-----------------|-------------|
-| `format` | desired image format. Possible values are Jpeg, Png and Webp. Defaults to Jpeg |
+| `format` | desired image format. Possible values are `Jpeg`, `Png` and `Webp`. Defaults to Jpeg |
 | `quality` | desired quality for the image. For Jpeg, it goes from 0 to 100 (defaults to 100). For Webp, it goes from 1 to 100 (defaults to 100). For Png, it will be ignored. |
 | `w` | desired width for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
 | `h` | desired height for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
@@ -160,6 +160,7 @@ The `/{file_name}` endpoint takes a filename as path parameter and has optional 
 | `wm_py` | position of the watermark in the Y axis. Value in pixels. |
 | `wm_h` | optional height of the watermark. Same resizing rules from original image applies for watermark images. |
 | `wm_w` | optional width of the watermark. Same resizing rules from original image applies for watermark images. |
+| `r` | optional rotation of the image. Possible values are `R90`, `R180` and `R270` |
 
 
 ## Conclusion

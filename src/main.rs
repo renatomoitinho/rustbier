@@ -41,6 +41,7 @@ struct QueryParameters {
     wm_alpha: Option<f64>,
     wm_h: Option<i32>,
     wm_w: Option<i32>,
+    r: Option<Rotation>,
 }
 
 fn index(
@@ -151,6 +152,7 @@ fn index(
                     },
                 }),
             },
+            rotation: query.r,
         },
         config.png_quality,
     )
@@ -162,6 +164,11 @@ fn index(
     Ok(HttpResponse::Ok()
         .content_type(format!("image/{}", fmt).as_str())
         .body(Body::from(img_response)))
+}
+
+fn test(req: HttpRequest) -> HttpResponse {
+    println!("{:?}", req.query_string());
+    HttpResponse::Ok().finish()
 }
 
 fn health() -> HttpResponse {
@@ -199,6 +206,7 @@ fn main() -> std::io::Result<()> {
                     .wrap(prometheus.clone())
                     .wrap(actix_web::middleware::Logger::default())
                     .service(web::resource("/health").route(web::get().to(health)))
+                    .service(web::resource("/test").route(web::get().to(test)))
                     .service(web::resource("/{file_name}").route(web::get().to(index))))
             },
         )?

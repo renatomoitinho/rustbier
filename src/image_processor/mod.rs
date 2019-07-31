@@ -24,13 +24,20 @@ pub fn process_image(
         ImageFormat::Png => png_quality as i32,
         _ => request.quality,
     };
+
+    let image = if let Some(rotation) = request.rotation {
+        rotate_image(&resized, &rotation)?
+    } else {
+        resized
+    };
+
     let quality = get_encode_params(&request.format, enc_quality as i32);
     let mut rs_buf = VectorOfuchar::new();
 
     debug!("Encoding to: {}", request.format);
     imgcodecs::imencode(
         format!(".{}", request.format).as_str(),
-        &resized,
+        &image,
         &mut rs_buf,
         &quality,
     )?;
@@ -106,6 +113,25 @@ fn apply_watermark(
     )?;
     wand.write_image_blob(format!("{}", format).as_str())
         .map_err(|e| e.into())
+}
+
+fn rotate_image(img: &core::Mat, rotation: &Rotation) -> Result<core::Mat, opencv::Error> {
+    let mut result_transpose = core::Mat::new()?;
+    let mut result_flip = core::Mat::new()?;
+    match rotation {
+        Rotation::R90 => {
+            core::transpose(&img, &mut result_transpose)?;
+            core::flip(&result_transpose, &mut result_flip, 0)?;
+        }
+        Rotation::R180 => {
+            core::flip(&img, &mut result_flip, -1)?;
+        }
+        Rotation::R270 => {
+            core::transpose(&img, &mut result_transpose)?;
+            core::flip(&result_transpose, &mut result_flip, 1)?;
+        }
+    }
+    Ok(result_flip)
 }
 
 fn resize_image(img: &core::Mat, size: &Size) -> Result<core::Mat, opencv::Error> {
