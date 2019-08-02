@@ -11,6 +11,7 @@ stages:
 - build-base
 - build
 - tests
+- deploy staging
 
 build-base-image:
   stage: build-base
@@ -40,3 +41,19 @@ e2e:
   stage: tests
   script:
     - make test
+    
+.deploy:
+  image: registry.naspersclassifieds.com/shared-services/core-services/deployment-util:latest
+  before_script:
+  - REVISION="${CI_COMMIT_SHORT_SHA}"
+  script:
+  - /usr/bin/deploymentUtil --resource="${IMAGE_NAME}-v1" --tag="${REVISION}"
+  only:
+    refs:
+    - master
+
+deploy-staging:
+  extends: .deploy
+  stage: deploy staging
+  environment:
+    name: staging
