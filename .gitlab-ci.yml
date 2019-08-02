@@ -5,6 +5,7 @@ services:
 
 before_script:
   - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+  - docker login -u "$ARTIFACTORY_USER" -p "$ARTIFACTORY_PASSWORD" docker.artifactory.olx.berlin
 
 stages:
 - build-base
