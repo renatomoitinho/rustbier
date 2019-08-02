@@ -53,6 +53,7 @@ To specify a custom image source specify `"region": "Custom"`. The configuration
 * Minio - S3 compatible container
 * Docker
 * Rust
+* ImageMagick
 
 This application relies on OpenCV and ImageMagick C++ libraries. That means it has to be previously installed into the system before compiling and/or running. (OpenCV is faster but produces bad results for watermarking, on the other hand ImageMagick produces better results but it is slower for resizing and re-encoding. Due to that, ImageMagick is used for watermarking only)
 
@@ -77,7 +78,7 @@ To build and run the application, run the following command:
 
 Alternatively, it is possible to run both components inside docker:
 
-```docker-compose up```
+```make up```
 
 AWS credentials should be configured [following the doc](https://github.com/rusoto/rusoto/blob/master/AWS-CREDENTIALS.md).
 
@@ -165,4 +166,4 @@ The `/{file_name}` endpoint takes a filename as path parameter and has optional 
 
 ## Conclusion
 
-YES, we lack naming creativiy, BUT, we love beer! :beers:
+YES, we lack naming creativity, BUT, we love beer! :beers:

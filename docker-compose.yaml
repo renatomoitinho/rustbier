@@ -1,7 +1,7 @@
 version: '3'
 services:
   s3:
-    image: minio/minio
+    image: docker.artifactory.olx.berlin/naspersclassifieds/apollo-dev-minio:v1.0
     volumes:
       - /data
     ports:
@@ -11,7 +11,7 @@ services:
       - MINIO_SECRET_KEY=apollopwd
     command: server /data
   rustbier:
-    image: registry.naspersclassifieds.com/shared-services/core-services/rustbier/rustbier
+    image: registry.naspersclassifieds.com/shared-services/core-services/rustbier/rustbier:${VERSION_TAG:-latest}
     volumes:
       - ./config:/config
     ports: 

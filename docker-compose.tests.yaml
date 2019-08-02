@@ -1,0 +1,11 @@
+version: '3'
+services:
+  cargo:
+    image: ${DOCKER_REGISTRY}/${DOCKER_ORG}/rustbier/base-rust-image:latest
+    environment: 
+        - RUSTBIER_HOST=rustbier
+    volumes:
+        - ./:/src
+    working_dir: /src
+    command: cargo test
+

@@ -4,6 +4,7 @@ use actix_web::client::Client;
 use bytes::Bytes;
 use futures::future::lazy;
 use futures::future::Future;
+use std::env;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
@@ -105,7 +106,7 @@ impl RequestParametersBuilder {
 
 pub fn get_results_file(filename: &str) -> Bytes {
     let mut file =
-        File::open(format!("tests/resources/results/{}", filename)).expect("file does not exist");
+        File::open(format!("tests/results/{}", filename)).expect("file does not exist");
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer).expect("can't read file");
     buffer.into()
@@ -169,7 +170,8 @@ fn get_url(params: &RequestParametersBuilder) -> String {
         query_string.push(format!("r={}", rotation));
     }
     format!(
-        "http://localhost:8080/{}?{}",
+        "http://{}:8080/{}?{}",
+        env::var("RUSTBIER_HOST").unwrap_or("localhost".into()),
         params.filename,
         query_string.join("&")
     )

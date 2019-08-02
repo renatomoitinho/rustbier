@@ -1,7 +1,9 @@
 DOCKER_REGISTRY ?= registry.naspersclassifieds.com
 DOCKER_ORG ?= shared-services/core-services
 
-REVISION ?= $(shell git rev-parse --short HEAD)
+PROJECT_NAME=rustbier
+
+REVISION ?= $(shell git rev-parse HEAD)
 ifeq ($(BUILD_NUMBER),)
 	VERSION_TAG ?= $(REVISION)
 else
@@ -10,19 +12,15 @@ endif
 
 S3_TEST_DATA=/data/apollo
 
-.PHONY: up setup-test test build-base-image build-image
+.PHONY: up test build-base-image build-image
 
 up:
-	docker-compose up -d
+	./environment/bin/setup.sh
 
-setup-test: up
-	docker-compose exec s3 mkdir "$(S3_TEST_DATA)" || true
-	docker cp tests/resources/watermark "rustbier_s3_1:$(S3_TEST_DATA)/watermark"
-	docker cp tests/resources/highres "rustbier_s3_1:$(S3_TEST_DATA)/highres"
-	docker cp tests/resources/img-test "rustbier_s3_1:$(S3_TEST_DATA)/img-test"
-
-test: setup-test
-	cargo test
+test: up
+	DOCKER_REGISTRY=$(DOCKER_REGISTRY) DOCKER_ORG=$(DOCKER_ORG) docker-compose -p $(PROJECT_NAME) \
+		-f docker-compose.yaml -f docker-compose.tests.yaml \
+		up --no-recreate --exit-code-from cargo
 
 build-base-image:
 	docker build -f Dockerfile.base -t "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:$(VERSION_TAG)" .
