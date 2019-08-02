@@ -36,6 +36,7 @@ build:
       - master
 
 e2e:
+  image: registry.naspersclassifieds.com/library/docker/build-images/deploy-dind:latest
   stage: tests
   script:
     - make test
