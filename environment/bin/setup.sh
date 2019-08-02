@@ -13,7 +13,7 @@ if ! docker info >/dev/null 2>&1; then
     DOCKER_COMPOSE=(sudo -EH "${DOCKER_COMPOSE[@]}")
 fi
 
-"${DOCKER_COMPOSE[@]}" up -d
+"${DOCKER_COMPOSE[@]}" up -d --remove-orphans
 
 eval 'container_s3="$( "${DOCKER_COMPOSE[@]}" ps s3 | awk '\''BEGIN{out=""}END{print(out)}/^[^ -]/{out=out$1}'\'' )"'
 

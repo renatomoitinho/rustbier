@@ -20,7 +20,7 @@ up:
 test: up
 	DOCKER_REGISTRY=$(DOCKER_REGISTRY) DOCKER_ORG=$(DOCKER_ORG) docker-compose -p $(PROJECT_NAME) \
 		-f docker-compose.yaml -f docker-compose.tests.yaml \
-		up --no-recreate --exit-code-from cargo
+		up --no-recreate --remove-orphans --exit-code-from cargo
 
 build-base-image:
 	docker build -f Dockerfile.base -t "$(DOCKER_REGISTRY)/$(DOCKER_ORG)/rustbier/base-rust-image:$(VERSION_TAG)" .
