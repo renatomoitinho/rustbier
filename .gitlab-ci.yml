@@ -51,7 +51,7 @@ e2e:
   before_script:
   - REVISION="${CI_COMMIT_SHA}"
   script:
-  - /usr/bin/deploymentUtil --resource="${IMAGE_NAME}-v1" --tag="${REVISION}"
+  - /usr/bin/deploymentUtil --resource="rustbier" --tag="${REVISION}"
   only:
     refs:
     - master
