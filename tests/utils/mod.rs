@@ -15,14 +15,18 @@ pub struct RequestParametersBuilder {
     quality: Option<i32>,
     w: Option<i32>,
     h: Option<i32>,
-    wm_position: Option<WatermarkPosition>,
-    wm_px: Option<i32>,
-    wm_py: Option<i32>,
-    wm_file: Option<String>,
-    wm_alpha: Option<f64>,
-    wm_h: Option<i32>,
-    wm_w: Option<i32>,
+    watermarks: Vec<Watermark>,
     r: Option<Rotation>,
+}
+
+pub struct Watermark {
+    filename: String,
+    x: i32,
+    y: i32,
+    origin: WatermarkPosition,
+    alpha: f64,
+    w: i32,
+    h: i32,
 }
 
 pub enum WatermarkPosition {
@@ -44,20 +48,14 @@ pub enum ImageFormat {
 }
 
 impl RequestParametersBuilder {
-    pub fn new(filename: String) -> Self {
+    pub fn new(filename: &str) -> Self {
         RequestParametersBuilder {
-            filename,
+            filename: filename.to_string(),
             format: None,
             quality: None,
             w: None,
             h: None,
-            wm_position: None,
-            wm_px: None,
-            wm_py: None,
-            wm_file: None,
-            wm_alpha: None,
-            wm_h: None,
-            wm_w: None,
+            watermarks: Vec::new(),
             r: None,
         }
     }
@@ -83,9 +81,9 @@ impl RequestParametersBuilder {
         self
     }
 
-    pub fn with_watermark(
+    pub fn add_watermark(
         &mut self,
-        file: String,
+        file: &str,
         w: i32,
         h: i32,
         alpha: f64,
@@ -93,20 +91,21 @@ impl RequestParametersBuilder {
         y: i32,
         pos: WatermarkPosition,
     ) -> &mut Self {
-        self.wm_file = Some(file);
-        self.wm_w = Some(w);
-        self.wm_h = Some(h);
-        self.wm_alpha = Some(alpha);
-        self.wm_px = Some(x);
-        self.wm_py = Some(y);
-        self.wm_position = Some(pos);
+        self.watermarks.push(Watermark {
+            filename: file.to_string(),
+            origin: pos,
+            x,
+            y,
+            alpha,
+            w,
+            h,
+        });
         self
     }
 }
 
 pub fn get_results_file(filename: &str) -> Bytes {
-    let mut file =
-        File::open(format!("tests/results/{}", filename)).expect("file does not exist");
+    let mut file = File::open(format!("tests/results/{}", filename)).expect("file does not exist");
     let mut buffer = Vec::new();
     file.read_to_end(&mut buffer).expect("can't read file");
     buffer.into()
@@ -137,38 +136,27 @@ fn get_url(params: &RequestParametersBuilder) -> String {
         query_string.push(format!("format={}", format));
     }
     if let Some(w) = params.w {
-        query_string.push(format!("w={}", w));
+        query_string.push(format!("size[width]={}", w));
     }
     if let Some(h) = params.h {
-        query_string.push(format!("h={}", h));
+        query_string.push(format!("size[height]={}", h));
     }
     if let Some(quality) = params.quality {
         query_string.push(format!("quality={}", quality));
     }
-    if let Some(wm_file) = &params.wm_file {
-        query_string.push(format!("wm_file={}", wm_file));
-    }
-    if let Some(wm_alpha) = params.wm_alpha {
-        query_string.push(format!("wm_alpha={}", wm_alpha));
-    }
-    if let Some(wm_h) = params.wm_h {
-        query_string.push(format!("wm_h={}", wm_h));
-    }
-    if let Some(wm_w) = params.wm_w {
-        query_string.push(format!("wm_w={}", wm_w));
-    }
-    if let Some(wm_position) = &params.wm_position {
-        query_string.push(format!("wm_position={}", wm_position));
-    }
-    if let Some(wm_px) = params.wm_px {
-        query_string.push(format!("wm_px={}", wm_px));
-    }
-    if let Some(wm_py) = params.wm_py {
-        query_string.push(format!("wm_py={}", wm_py));
-    }
     if let Some(rotation) = &params.r {
-        query_string.push(format!("r={}", rotation));
+        query_string.push(format!("rotation={}", rotation));
     }
+    for (i, item) in params.watermarks.iter().enumerate() {
+        query_string.push(format!("watermarks[{}][filename]={}", i, item.filename));
+        query_string.push(format!("watermarks[{}][alpha]={}", i, item.alpha));
+        query_string.push(format!("watermarks[{}][size][height]={}", i, item.h));
+        query_string.push(format!("watermarks[{}][size][width]={}", i, item.w));
+        query_string.push(format!("watermarks[{}][origin]={}", i, item.origin));
+        query_string.push(format!("watermarks[{}][position][x]={}", i, item.x));
+        query_string.push(format!("watermarks[{}][position][y]={}", i, item.y));
+    }
+
     format!(
         "http://{}:8080/{}?{}",
         env::var("RUSTBIER_HOST").unwrap_or("localhost".into()),

@@ -1,4 +1,5 @@
 pub mod errors;
+pub mod s3;
 
 use config::{Config, ConfigError, File};
 use errors::InvalidSizeError;
@@ -43,45 +44,54 @@ pub struct Configuration {
     pub log_level: Option<String>,
 }
 
-#[derive(Debug)]
-pub struct ProcessImageRequest<'a> {
+#[derive(Debug, Deserialize)]
+pub struct ProcessImageRequest {
+    #[serde(default)]
     pub size: Size,
+    #[serde(default)]
     pub format: ImageFormat,
+    #[serde(default = "default_quality")]
     pub quality: i32,
-    pub watermark: Option<Watermark<'a>>,
+    #[serde(default)]
+    pub watermarks: Vec<Watermark>,
+    #[serde(default)]
     pub rotation: Option<Rotation>,
 }
 
-#[derive(Debug)]
-pub struct Watermark<'a> {
-    pub file: &'a [u8],
+#[derive(Debug, Deserialize, Clone)]
+pub struct Watermark {
+    pub filename: String,
+    #[serde(default)]
     pub position: Point,
+    #[serde(default)]
     pub origin: WatermarkPosition,
+    #[serde(default)]
     pub alpha: f64,
+    #[serde(default)]
     pub size: Size,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Size {
     pub width: Option<i32>,
     pub height: Option<i32>,
 }
 
-#[derive(Debug, Deserialize, Clone, Copy)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum WatermarkPosition {
     Center,
     LeftTop,
     RightBottom,
 }
 
-#[derive(Debug, Deserialize, Clone, Copy)]
+#[derive(Debug, Deserialize)]
 pub enum Rotation {
     R90,
     R180,
     R270,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Point {
     pub x: i32,
     pub y: i32,
@@ -94,6 +104,10 @@ pub enum ImageFormat {
     Webp,
 }
 
+fn default_quality() -> i32 {
+    100
+}
+
 impl fmt::Display for ImageFormat {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let as_str = match self {
@@ -102,6 +116,33 @@ impl fmt::Display for ImageFormat {
             ImageFormat::Webp => "webp",
         };
         write!(f, "{}", as_str)
+    }
+}
+
+impl Default for Size {
+    fn default() -> Self {
+        Size {
+            width: None,
+            height: None,
+        }
+    }
+}
+
+impl Default for Point {
+    fn default() -> Self {
+        Point { x: 0, y: 0 }
+    }
+}
+
+impl Default for ImageFormat {
+    fn default() -> Self {
+        ImageFormat::Jpeg
+    }
+}
+
+impl Default for WatermarkPosition {
+    fn default() -> Self {
+        WatermarkPosition::LeftTop
     }
 }
 

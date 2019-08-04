@@ -84,6 +84,12 @@ impl From<InvalidSizeError> for opencv::Error {
 
 impl From<MagickError> for opencv::Error {
     fn from(error: MagickError) -> Self {
-        opencv::Error::new(-1, format!("InvalidSizeError: {}", error))
+        opencv::Error::new(-1, format!("MagickError: {}", error))
+    }
+}
+
+impl From<MagickError> for actix_web::Error {
+    fn from(error: MagickError) -> Self {
+        actix_web::error::ErrorInternalServerError(error)
     }
 }

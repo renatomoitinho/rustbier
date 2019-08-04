@@ -32,7 +32,7 @@ dependencies = [
 
 [[package]]
 name = "actix-http"
-version = "0.2.7"
+version = "0.2.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "actix-codec 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -179,7 +179,7 @@ version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "actix-codec 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "actix-http 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "actix-http 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-router 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-rt 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-server 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -303,7 +303,7 @@ version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "actix-codec 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
- "actix-http 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "actix-http 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-service 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "base64 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "bytes 0.4.12 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1495,7 +1495,7 @@ dependencies = [
 
 [[package]]
 name = "opencv"
-version = "0.18.0"
+version = "0.19.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "cc 1.0.37 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2006,7 +2006,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 name = "rustbier"
 version = "0.1.0"
 dependencies = [
- "actix-http 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "actix-http 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-rt 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-server 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "actix-web 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2016,7 +2016,7 @@ dependencies = [
  "futures 0.1.28 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "magick_rust 0.11.0 (git+https://github.com/nlfiedler/magick-rust)",
- "opencv 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "opencv 0.19.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_env_logger 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusoto_core 0.40.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rusoto_s3 0.40.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2154,6 +2154,7 @@ name = "serde_qs"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
+ "actix-web 1.0.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "data-encoding 2.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.12.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "percent-encoding 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -2811,7 +2812,7 @@ dependencies = [
 [metadata]
 "checksum actix-codec 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "9f2c11af4b06dc935d8e1b1491dad56bfb32febc49096a91e773f8535c176453"
 "checksum actix-connect 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "818f0901d2188c8c75a489c42db6e8d9e1b020f0ca2baaa4c940e08e1817eed0"
-"checksum actix-http 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)" = "59698e11ceb42ea16a2e491bd5a9b48adc7268323a5b600522d408d09783828c"
+"checksum actix-http 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)" = "4d45d3f033fb7ff73467dad0ef1d12afb532b39953d50f4124f4d89451670583"
 "checksum actix-router 0.1.5 (registry+https://github.com/rust-lang/crates.io-index)" = "23224bb527e204261d0291102cb9b52713084def67d94f7874923baefe04ccf7"
 "checksum actix-rt 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "18d9054b1cfacfa441846b9b99001010cb8fbb02130e6cfdb25cea36d3e98e87"
 "checksum actix-server 0.6.0 (registry+https://github.com/rust-lang/crates.io-index)" = "fb3038e9e457e0a498ea682723e0f4e6cc2c4f362a1868d749808355275ad959"
@@ -2968,7 +2969,7 @@ dependencies = [
 "checksum num_cpus 1.10.1 (registry+https://github.com/rust-lang/crates.io-index)" = "bcef43580c035376c0705c42792c294b66974abbfd2789b511784023f71f3273"
 "checksum numtoa 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "b8f8bdf33df195859076e54ab11ee78a1b208382d3a26ec40d142ffc1ecc49ef"
 "checksum once_cell 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "4c7118943e044e53fb4f0400ba153201e7b3e1ee61f137d47aa45367223caa19"
-"checksum opencv 0.18.0 (registry+https://github.com/rust-lang/crates.io-index)" = "50147c922fbadf35e66707086cf3e821441bad627e38c488b03f574b145c6de1"
+"checksum opencv 0.19.1 (registry+https://github.com/rust-lang/crates.io-index)" = "aec72e1557aacd094a176ec43a5e16d14a614b4247585df3e454ef6360e88be9"
 "checksum openssl 0.10.23 (registry+https://github.com/rust-lang/crates.io-index)" = "97c140cbb82f3b3468193dd14c1b88def39f341f68257f8a7fe8ed9ed3f628a5"
 "checksum openssl-probe 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "77af24da69f9d9341038eba93a073b1fdaaa1b788221b00a69bce9e762cb32de"
 "checksum openssl-sys 0.9.47 (registry+https://github.com/rust-lang/crates.io-index)" = "75bdd6dbbb4958d38e47a1d2348847ad1eb4dc205dc5d37473ae504391865acc"

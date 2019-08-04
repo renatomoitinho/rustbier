@@ -11,71 +11,58 @@ use magick_rust::bindings::{
 };
 use magick_rust::{MagickWand, PixelWand};
 
-pub fn process_image(
+pub fn pre_process_image(
     buffer: &[u8],
-    request: ProcessImageRequest,
+    rotation: &Option<Rotation>,
+    size: &Size,
+    format: &ImageFormat,
+    quality: i32,
     png_quality: u8,
 ) -> Result<Vec<u8>, opencv::Error> {
-    info!("Processing request {:?}", request);
     let mat_buf = core::Mat::from_slice(buffer)?;
+    debug!("Resizing image to {:?}", size);
     let src_mat = imgcodecs::imdecode(&mat_buf, imgcodecs::IMREAD_UNCHANGED)?;
-    let resized = resize_image(&src_mat, &request.size)?;
-    let enc_quality = match request.format {
+    let resized = if size.height.is_none() && size.width.is_none() {
+        src_mat
+    } else {
+        resize_image(&src_mat, &size)?
+    };
+    let enc_quality = match format {
         ImageFormat::Png => png_quality as i32,
-        _ => request.quality,
+        _ => quality,
     };
 
-    let image = if let Some(rotation) = request.rotation {
+    debug!("Rotating image to {:?}", rotation);
+    let image = if let Some(rotation) = rotation {
         rotate_image(&resized, &rotation)?
     } else {
         resized
     };
 
-    let quality = get_encode_params(&request.format, enc_quality as i32);
+    let quality = get_encode_params(&format, enc_quality as i32);
     let mut rs_buf = VectorOfuchar::new();
 
-    debug!("Encoding to: {}", request.format);
+    debug!("Encoding to: {}", format);
     imgcodecs::imencode(
-        format!(".{}", request.format).as_str(),
+        format!(".{}", format).as_str(),
         &image,
         &mut rs_buf,
         &quality,
     )?;
-    if let Some(watermark) = request.watermark {
-        apply_watermark(&rs_buf.to_vec(), &watermark, &request.format).map_err(|e| e.into())
-    } else {
-        Ok(rs_buf.to_vec())
-    }
+    Ok(rs_buf.to_vec())
 }
 
-fn get_encode_params(f: &ImageFormat, q: i32) -> VectorOfint {
-    let mut quality = VectorOfint::with_capacity(2);
-    match f {
-        ImageFormat::Jpeg => {
-            quality.push(imgcodecs::IMWRITE_JPEG_QUALITY);
-            quality.push(q);
-        }
-        ImageFormat::Png => {
-            quality.push(imgcodecs::IMWRITE_PNG_COMPRESSION);
-            quality.push(q);
-        }
-        ImageFormat::Webp => {
-            quality.push(imgcodecs::IMWRITE_WEBP_QUALITY);
-            quality.push(q);
-        }
-    };
-    quality
-}
-
-fn apply_watermark(
-    img: &Vec<u8>,
+pub fn apply_watermark(
+    img: &[u8],
+    wm_buffer: &[u8],
     watermark: &Watermark,
     format: &ImageFormat,
 ) -> Result<Vec<u8>, MagickError> {
+    debug!("Applying watermark: {:?}", watermark);
     let wand = MagickWand::new();
     wand.read_image_blob(img)?;
     let wand_wm = MagickWand::new();
-    wand_wm.read_image_blob(watermark.file)?;
+    wand_wm.read_image_blob(wm_buffer)?;
     let wm_width = wand_wm.get_image_width() as i32;
     let wm_height = wand_wm.get_image_height() as i32;
     let (wm_target_width, wm_target_height) =
@@ -116,8 +103,8 @@ fn apply_watermark(
 }
 
 fn rotate_image(img: &core::Mat, rotation: &Rotation) -> Result<core::Mat, opencv::Error> {
-    let mut result_transpose = core::Mat::new()?;
-    let mut result_flip = core::Mat::new()?;
+    let mut result_transpose = core::Mat::default()?;
+    let mut result_flip = core::Mat::default()?;
     match rotation {
         Rotation::R90 => {
             core::transpose(&img, &mut result_transpose)?;
@@ -134,6 +121,25 @@ fn rotate_image(img: &core::Mat, rotation: &Rotation) -> Result<core::Mat, openc
     Ok(result_flip)
 }
 
+fn get_encode_params(f: &ImageFormat, q: i32) -> VectorOfint {
+    let mut quality = VectorOfint::with_capacity(2);
+    match f {
+        ImageFormat::Jpeg => {
+            quality.push(imgcodecs::IMWRITE_JPEG_QUALITY);
+            quality.push(q);
+        }
+        ImageFormat::Png => {
+            quality.push(imgcodecs::IMWRITE_PNG_COMPRESSION);
+            quality.push(q);
+        }
+        ImageFormat::Webp => {
+            quality.push(imgcodecs::IMWRITE_WEBP_QUALITY);
+            quality.push(q);
+        }
+    };
+    quality
+}
+
 fn resize_image(img: &core::Mat, size: &Size) -> Result<core::Mat, opencv::Error> {
     let original_width = img.cols()?;
     let original_height = img.rows()?;
@@ -146,7 +152,7 @@ fn resize_image(img: &core::Mat, size: &Size) -> Result<core::Mat, opencv::Error
     let (target_width, target_height) = get_target_size(original_width, original_height, &size)?;
 
     debug!("Final size: {}x{}", target_width, target_height);
-    let mut result = core::Mat::new()?;
+    let mut result = core::Mat::default()?;
 
     imgproc::resize(
         img,
