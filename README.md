@@ -148,21 +148,23 @@ The `/{file_name}` endpoint takes a filename as path parameter and has optional 
 |-----------------|-------------|
 | `format` | desired image format. Possible values are `Jpeg`, `Png` and `Webp`. Defaults to Jpeg |
 | `quality` | desired quality for the image. For Jpeg, it goes from 0 to 100 (defaults to 100). For Webp, it goes from 1 to 100 (defaults to 100). For Png, it will be ignored. |
-| `w` | desired width for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
-| `h` | desired height for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
- 
+| `size[width]` | desired width for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
+| `size[height]` | desired height for the image. Images won't get upscaled or have their aspect ratio changed by variations on parameters for width and height. |
+| `rotation` | optional rotation of the image. Possible values are `R90`, `R180` and `R270` |
+
 #### Watermarking query parameters
+
+Watemarks is an array parameter and therefore, must be indexed when informed (0 indexed).
+
 | Parameter | Description |
 |-----------------|-------------|
-| `wm_file` | watermark file. File has to be smaller than original file. |
-| `wm_alpha` | opacity from the watermark over the original image. it is a floating point number from 0 to 1. |
-| `wm_position` | identifier to position the watermark starting from left-top, right-bottom or if it should be centered (`wm_px` and `wm_py` will be ignored in that case). Possible values: LeftTop (default), RightBottom, Center. |
-| `wm_px` | position of the watermark in the X axis. Value in pixels. |
-| `wm_py` | position of the watermark in the Y axis. Value in pixels. |
-| `wm_h` | optional height of the watermark. Same resizing rules from original image applies for watermark images. |
-| `wm_w` | optional width of the watermark. Same resizing rules from original image applies for watermark images. |
-| `r` | optional rotation of the image. Possible values are `R90`, `R180` and `R270` |
-
+| `watemarks[0][filename]` | watermark file. File has to be smaller than original file. |
+| `watemarks[0][alpha]` | opacity from the watermark over the original image. it is a floating point number from 0 to 1. |
+| `watemarks[0][origin]` | identifier to position the watermark starting from left-top, right-bottom or if it should be centered (`position.x` and `position.y` will be ignored in that case). Possible values: LeftTop (default), RightBottom, Center. |
+| `watemarks[0][position][x]` | position of the watermark in the X axis. Value in pixels. |
+| `watemarks[0][position][y]` | position of the watermark in the Y axis. Value in pixels. |
+| `watemarks[0][size][height]` | optional height of the watermark. Same resizing rules from original image applies for watermark images. |
+| `watemarks[0][size][width]` | optional width of the watermark. Same resizing rules from original image applies for watermark images. |
 
 ## Conclusion
 
