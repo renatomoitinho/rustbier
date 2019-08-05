@@ -8,8 +8,6 @@ use magick_rust::bindings::MetricType_PerceptualHashErrorMetric;
 use magick_rust::{magick_wand_genesis, MagickWand};
 use std::env;
 use std::fmt;
-use std::fs::File;
-use std::io::Read;
 use std::sync::Once;
 
 static START: Once = Once::new();
@@ -109,25 +107,19 @@ impl RequestParametersBuilder {
     }
 }
 
-pub fn get_results_file(filename: &str) -> Bytes {
-    let mut file = File::open(format!("tests/results/{}", filename)).expect("file does not exist");
-    let mut buffer = Vec::new();
-    file.read_to_end(&mut buffer).expect("can't read file");
-    buffer.into()
-}
-
-pub fn are_images_equal(img1: &[u8], img2: &[u8]) -> bool {
+pub fn assert_result(img: &[u8], filename: &str) {
     START.call_once(|| {
         magick_wand_genesis();
     });
     let wand1 = MagickWand::new();
-    wand1.read_image_blob(img1).expect("Unable to read img1");
+    wand1.read_image_blob(img).expect("Unable to read response image");
     let wand2 = MagickWand::new();
-    wand2.read_image_blob(img2).expect("Unable to read img2");
+    let file_result = format!("tests/results/{}", filename);
+    wand2.read_image(&file_result).expect("Unable to result image");
 
     let (diff, _res_wand) = wand1.compare_images(&wand2, MetricType_PerceptualHashErrorMetric);
     println!("Image diff: {}", diff);
-    diff == 0.0
+    assert!(diff == 0.0);
 }
 
 pub fn make_request(params: &RequestParametersBuilder) -> Result<Bytes, SendRequestError> {
