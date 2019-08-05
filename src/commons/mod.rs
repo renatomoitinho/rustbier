@@ -156,7 +156,7 @@ impl Configuration {
         // Add in the current environment file
         // Default to 'development' env
         // Note that this file is _optional_
-        let env = env::var("RUN_MODE").unwrap_or("development".into());
+        let env = env::var("RUN_MODE").unwrap_or_else(|_| "development".into());
         s.merge(File::with_name(&format!("config/{}", env)).required(false))?;
 
         // Deserialize (and thus freeze) the entire configuration as

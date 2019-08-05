@@ -4,16 +4,15 @@ use actix_web::client::Client;
 use bytes::Bytes;
 use futures::future::lazy;
 use futures::future::Future;
+use magick_rust::bindings::MetricType_PerceptualHashErrorMetric;
+use magick_rust::{magick_wand_genesis, MagickWand};
 use std::env;
 use std::fmt;
 use std::fs::File;
 use std::io::Read;
 use std::sync::Once;
-use magick_rust::{MagickWand, magick_wand_genesis};
-use magick_rust::bindings::MetricType_PerceptualHashErrorMetric;
 
 static START: Once = Once::new();
-
 
 pub struct RequestParametersBuilder {
     filename: String,
@@ -130,7 +129,6 @@ pub fn are_images_equal(img1: &[u8], img2: &[u8]) -> bool {
     println!("Image diff: {}", diff);
     diff == 0.0
 }
-
 
 pub fn make_request(params: &RequestParametersBuilder) -> Result<Bytes, SendRequestError> {
     System::new("test").block_on(lazy(|| {

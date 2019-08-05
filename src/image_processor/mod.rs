@@ -13,9 +13,9 @@ use magick_rust::{MagickWand, PixelWand};
 
 pub fn pre_process_image(
     buffer: &[u8],
-    rotation: &Option<Rotation>,
+    rotation: Option<Rotation>,
     size: &Size,
-    format: &ImageFormat,
+    format: ImageFormat,
     quality: i32,
     png_quality: u8,
 ) -> Result<Vec<u8>, opencv::Error> {
@@ -28,18 +28,18 @@ pub fn pre_process_image(
         resize_image(&src_mat, &size)?
     };
     let enc_quality = match format {
-        ImageFormat::Png => png_quality as i32,
+        ImageFormat::Png => i32::from(png_quality),
         _ => quality,
     };
 
     debug!("Rotating image to {:?}", rotation);
     let image = if let Some(rotation) = rotation {
-        rotate_image(&resized, &rotation)?
+        rotate_image(&resized, rotation)?
     } else {
         resized
     };
 
-    let quality = get_encode_params(&format, enc_quality as i32);
+    let quality = get_encode_params(format, enc_quality as i32);
     let mut rs_buf = VectorOfuchar::new();
 
     debug!("Encoding to: {}", format);
@@ -56,7 +56,7 @@ pub fn apply_watermark(
     img: &[u8],
     wm_buffer: &[u8],
     watermark: &Watermark,
-    format: &ImageFormat,
+    format: ImageFormat,
 ) -> Result<Vec<u8>, MagickError> {
     debug!("Applying watermark: {:?}", watermark);
     let wand = MagickWand::new();
@@ -102,7 +102,7 @@ pub fn apply_watermark(
         .map_err(|e| e.into())
 }
 
-fn rotate_image(img: &core::Mat, rotation: &Rotation) -> Result<core::Mat, opencv::Error> {
+fn rotate_image(img: &core::Mat, rotation: Rotation) -> Result<core::Mat, opencv::Error> {
     let mut result_transpose = core::Mat::default()?;
     let mut result_flip = core::Mat::default()?;
     match rotation {
@@ -121,7 +121,7 @@ fn rotate_image(img: &core::Mat, rotation: &Rotation) -> Result<core::Mat, openc
     Ok(result_flip)
 }
 
-fn get_encode_params(f: &ImageFormat, q: i32) -> VectorOfint {
+fn get_encode_params(f: ImageFormat, q: i32) -> VectorOfint {
     let mut quality = VectorOfint::with_capacity(2);
     match f {
         ImageFormat::Jpeg => {

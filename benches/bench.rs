@@ -9,19 +9,24 @@ use test::Bencher;
 #[bench]
 fn bench_simple(bencher: &mut Bencher) {
     bencher.iter(|| {
-        System::new("test").block_on(lazy(|| {
-            let client = Client::default();
-            client
-                .get("http://127.0.0.1:8080/highres?size[width]=500&quality=90&rotation=R90")
-                .header("User-Agent", "Actix-web")
-                .send()
-                .map_err(|e| panic!("request error: {}", e))
-                .map(|mut response| {
-                    println!("Response: {:?}", response);
-                    response.body().limit(1024 * 1024).map_err(|e| panic!("error: {}", e))
-                })
-                .flatten()
-        })).expect("Unable to download file")
+        System::new("test")
+            .block_on(lazy(|| {
+                let client = Client::default();
+                client
+                    .get("http://127.0.0.1:8080/highres?size[width]=500&quality=90&rotation=R90")
+                    .header("User-Agent", "Actix-web")
+                    .send()
+                    .map_err(|e| panic!("request error: {}", e))
+                    .map(|mut response| {
+                        println!("Response: {:?}", response);
+                        response
+                            .body()
+                            .limit(1024 * 1024)
+                            .map_err(|e| panic!("error: {}", e))
+                    })
+                    .flatten()
+            }))
+            .expect("Unable to download file")
     });
 }
 

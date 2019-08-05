@@ -37,7 +37,9 @@ fn index(
     s3_client: web::Data<S3Client>,
     config: web::Data<Configuration>,
 ) -> impl Future<Item = HttpResponse, Error = actix_web::Error> {
-    let rs_query = qs_config.deserialize_str::<ProcessImageRequest>(req.query_string()).map_err(|e| actix_web::error::ErrorBadRequest(e));
+    let rs_query = qs_config
+        .deserialize_str::<ProcessImageRequest>(req.query_string())
+        .map_err(actix_web::error::ErrorBadRequest);
     futures::done(rs_query).and_then(move |query| {
         debug!("Request parameters: {:?}", query);
 
@@ -50,9 +52,6 @@ fn index(
         } = query;
         let bucket = Arc::new(config.bucket.clone());
         let bucket_cp = bucket.clone();
-        let format1 = Arc::new(format);
-        let format2 = format1.clone();
-        let format3 = format1.clone();
         let s3_client_cp = s3_client.clone();
         let wm_futures = watermarks
             .clone()
@@ -62,9 +61,9 @@ fn index(
             .map(move |body| {
                 pre_process_image(
                     &body[..],
-                    &rotation,
+                    rotation,
                     &size,
-                    &format1,
+                    format,
                     quality,
                     config.png_quality,
                 )
@@ -80,19 +79,19 @@ fn index(
                         .zip(watermarks)
                         .fold(body, move |current, item| {
                             let (wm_buffer, wm) = item;
-                            apply_watermark(&current?, &wm_buffer[..], &wm, &format2)
+                            apply_watermark(&current?, &wm_buffer[..], &wm, format)
                                 .map_err(|e| e.into())
                         })
                 })
             })
             .flatten()
-            .and_then(move |res| index_response(res, &format3))
-        })
+            .and_then(move |res| index_response(res, format))
+    })
 }
 
 fn index_response(
     res: Result<Vec<u8>, actix_web::error::Error>,
-    format: &ImageFormat,
+    format: ImageFormat,
 ) -> HttpResponse {
     match res {
         Err(e) => {
