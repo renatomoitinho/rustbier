@@ -5,7 +5,7 @@ fn test_get_simple() {
     let expected = utils::get_results_file("raw.jpg");
     let result = utils::make_request(&utils::RequestParametersBuilder::new("img-test"))
         .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -15,7 +15,7 @@ fn test_get_rotated() {
         &utils::RequestParametersBuilder::new("img-test").with_rotation(utils::Rotation::R270),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -24,7 +24,7 @@ fn test_get_resized() {
     let result =
         utils::make_request(&utils::RequestParametersBuilder::new("img-test").with_size(100, 100))
             .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -42,7 +42,7 @@ fn test_get_watermarked_left() {
         ),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -60,7 +60,7 @@ fn test_get_watermarked_right() {
         ),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -78,7 +78,7 @@ fn test_get_watermarked_center() {
         ),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -98,7 +98,7 @@ fn test_get_watermarked_rotated() {
             .with_rotation(utils::Rotation::R90),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -108,7 +108,7 @@ fn test_get_encoded_png() {
         &utils::RequestParametersBuilder::new("img-test").with_format(utils::ImageFormat::Png),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -118,7 +118,7 @@ fn test_get_encoded_webp() {
         &utils::RequestParametersBuilder::new("img-test").with_format(utils::ImageFormat::Webp),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -130,7 +130,7 @@ fn test_get_encoded_webp_bad_quality() {
             .with_quality(10),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -142,7 +142,7 @@ fn test_get_raw_bad_quality() {
             .with_quality(10),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -179,7 +179,7 @@ fn test_get_multiple_watermarks() {
             ),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
 
 #[test]
@@ -211,5 +211,5 @@ fn test_get_all_features() {
             .with_size(150, 150),
     )
     .expect("Unable to download file");
-    assert!(expected == result);
+    assert!(utils::are_images_equal(&result[..], &expected[..]));
 }
