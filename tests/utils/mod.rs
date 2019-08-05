@@ -127,6 +127,7 @@ pub fn are_images_equal(img1: &[u8], img2: &[u8]) -> bool {
     wand2.read_image_blob(img2).expect("Unable to read img2");
 
     let (diff, _res_wand) = wand1.compare_images(&wand2, MetricType_PerceptualHashErrorMetric);
+    println!("Image diff: {}", diff);
     diff == 0.0
 }
 
