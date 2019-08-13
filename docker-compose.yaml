@@ -20,8 +20,6 @@ services:
       - AWS_ACCESS_KEY_ID=apollousr
       - AWS_SECRET_ACCESS_KEY=apollopwd
       - RUN_MODE=compose
-    depends_on: 
-      - s3
 volumes:
   s3-data:
     driver: local
